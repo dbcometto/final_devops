@@ -10,6 +10,8 @@ execute:
 
 Here we will explore the Palmer Penguin dataset.
 
+![ChatGPT-Generated Penguins](gpt-penguins2.png)
+
 ```{r}
 library(palmerpenguins)
 library(dplyr)

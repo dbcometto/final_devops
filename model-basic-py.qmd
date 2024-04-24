@@ -5,7 +5,15 @@ format:
     code-fold: false
 ---
 
-Here we will create our model for the Palmer Penguin dataset.  We are trying to predict `body_mass_g` based on `bill_length_mm`, `species`, and `sex`.  Based on our [exploration](eda-basic.qmd), the data looks to have a somewhat-linear relationship.  Thus, let's implement a linear regression model, for simplicity and interpretability.
+Here we will create our model for the Palmer Penguin dataset.  We are trying to predict `body_mass_g` based on `bill_length_mm`, `species`, and `sex`.  
+
+**The finished model can be accessed [here](http://{{< var apphost >}}:8090){target="_blank"}**.  It runs on a background API and a ShinyApp.  However, let's dive into how the model is created.
+
+![ChatGPT-Generated Penguins](gpt-penguins3.png)
+
+## Model Creation
+
+Based on our [exploration](eda-basic.qmd), the data looks to have a somewhat-linear relationship.  Thus, let's implement a linear regression model, for simplicity and interpretability.
 
 Remember, our primary goal for this project is a proof of concept of developmental operations for data science.  Thus, a simple, interpretable model will be best.
 
@@ -33,14 +41,21 @@ Scikit for Python contains powerful tools that make creating models easy.
 Here, then, is some statistics from the model.
 
 ```{python}
-#| code-fold: true
-print(f"R^2 {model.score(X,y)}")
-print(f"Intercept {model.intercept_}")
-print(f"Columns {X.columns}")
-print(f"Coefficients {model.coef_}")
+#| echo: false
+print(f"R^2: {model.score(X,y)}")
 ```
-
-A few inferences that we can make is that for every mm of `bill_length_mm`, `body_mass_g` increases by 32.5g.  Also, the Chinstrap species has less mass than the other two, and Gentoo has the most mass.  Males are also, typically, heavier than females.
 
 We can see that approximately 85% of the variance of the data is explained by our model.  While far from perfect, it is good enough for demonstration purposes.
 
+We can also access model parameters.
+
+```{python}
+#| echo: false
+print(f"Intercept: {model.intercept_}")
+print(f"Columns: {X.columns}")
+print(f"Coefficients> {model.coef_}")
+```
+
+Thus, our model can be written as $m = 32.5 l -298.7 c + 1094.8 g + 547.3 s + 2169$ where $m$ is mass in grams, $l$ is bill length in mm, and $c$ and $g$ are 0 or 1 depending on whether the species is Chinstrap or Gentoo, respectively, and $s$ is 1 if sex is male.
+
+A few inferences that we can make is that for every 1mm of `bill_length_mm`, `body_mass_g` increases by 32.5g.  Also, the Chinstrap species has less mass than the other two, and Gentoo has the most mass.  Males are also, typically, heavier than females.
