@@ -1,0 +1,21 @@
+services:
+  api:
+    hostname: myapi
+    image: devops-api
+    command: python runapi.py
+    ports:
+      - 8080:8080
+
+  app:
+    hostname: myapp
+    image: devops-app
+    command: python app-log.py
+    ports:
+      - 8090:8090
+
+  web:
+    image: devops-web
+    ports:
+      - 8095:80
+    volumes:
+      - ./docs:/usr/share/nginx/html

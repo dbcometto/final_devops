@@ -1,18 +1,29 @@
 project:
   type: website
   output-dir: docs
+  render: 
+    - "index.qmd"
+    - "about.qmd"
+    - "eda-basic.qmd"
+    - "model-basic-py.qmd"
 
 website:
-  title: "final_devops"
+  title: "Devops"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: eda-basic.qmd
+        text: EDA
+      - href: model-basic-py.qmd
+        text: Model
+      - href: about.qmd
+        text: About
+    collapse: true
 
 format:
   html:
-    theme: cosmo
+    theme: sandstone
     css: styles.css
     toc: true
 

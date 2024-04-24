@@ -1,9 +1,34 @@
 ---
 title: "About"
+format:
+  html:
+    code-fold: true
 ---
 
-About this site
+This site was created by C2C Ben Cometto for the Math 378 Stats Final Project.  It is all build with docker compose, and runs with wizardy... not to be confused with magic.
 
-```{r}
-1 + 1
+Docker compose is a system that allows multiple docker containers to be started simultaneously.  For this project, the `docker-compose.yml` file is as follows.
+
+```
+services:
+  api:
+    hostname: myapi
+    image: devops-api
+    command: python runapi.py
+    ports:
+      - 8080:8080
+
+  app:
+    hostname: myapp
+    image: devops-app
+    command: python app-log.py
+    ports:
+      - 8090:8090
+
+  web:
+    image: devops-web
+    ports:
+      - 8095:80
+    volumes:
+      - ./docs:/usr/share/nginx/html
 ```

@@ -3,9 +3,12 @@ title: "Penguins EDA"
 format:
   html:
     code-fold: true
+execute:
+  warning: false
+  echo: false
 ---
 
-## Penguin Size and Mass by Sex and Species
+Here we will explore the Palmer Penguin dataset.
 
 ```{r}
 library(palmerpenguins)
@@ -14,6 +17,26 @@ library(ggplot2)
 
 df <- palmerpenguins::penguins
 ```
+
+## Initial Observations
+
+We will start with looking at the variables that are present in the dataset.
+
+```{r}
+glimpse(df)
+```
+
+We can see that we have `species`, `island`, and `sex` as factors, `year`, `flipper_length_mm`, and `body_mass_g` as integers, and `bill_length_mm` and `bill_depth_mm` as doubles.  
+
+Now, let's get a sample of what the data looks like.
+
+```{r}
+head(df,5)
+```
+
+## Tables
+
+We can continue our exploration with a table that shows the average size values when the observations are grouped by sex and species.
 
 ```{r}
 df %>%
@@ -27,7 +50,27 @@ df %>%
   knitr::kable()
 ```
 
-## Penguin Size vs Mass by Species
+This can be contrasted with the medians of each group, as is seen below.  
+
+```{r}
+df %>%
+  group_by(species, sex) %>%
+  summarise(
+    across(
+      where(is.numeric), 
+      \(x) median(x, na.rm = TRUE)
+      )
+    ) %>%
+  knitr::kable()
+```
+
+The medians are very close to the averages.
+
+## Scatterplots
+
+By looking at scatterplots we can see what relationships exist within the data.
+
+We first will look at a scatterplot of `bill_length_mm` and `body_mass_g` by `species`.
 
 ```{r}
 df %>%
@@ -35,3 +78,23 @@ df %>%
   geom_point() + 
   geom_smooth(method = "lm")
 ```
+
+This can also be done with `sex`.
+
+```{r}
+df %>%
+  ggplot(aes(x = bill_length_mm, y = body_mass_g, color = sex)) +
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+And, with `island`.
+
+```{r}
+df %>%
+  ggplot(aes(x = bill_length_mm, y = body_mass_g, color = island)) +
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+Based on these three graphs, we can see that it does appear that there is a relationship between `body_mass_g` based on `sex`, `island`, `species`, and `bill_length_mm`.  Thus, let's create a model that predicts `body_mass_g` based on those predictors.

@@ -2,8 +2,14 @@
 title: "Model"
 format:
   html:
-    code-fold: true
+    code-fold: false
 ---
+
+Here we will create our model for the Palmer Penguin dataset.  We are trying to predict `body_mass_g` based on `bill_length_mm`, `species`, and `sex`.  Based on our [exploration](eda-basic.qmd), the data looks to have a somewhat-linear relationship.  Thus, let's implement a linear regression model, for simplicity and interpretability.
+
+Remember, our primary goal for this project is a proof of concept of developmental operations for data science.  Thus, a simple, interpretable model will be best.
+
+The following code chunk imports the dataset and creates a linear regression model.
 
 ```{python}
 from palmerpenguins import penguins
@@ -11,30 +17,30 @@ from pandas import get_dummies
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn import preprocessing
-```
 
-## Get Data
-
-```{python}
 df = penguins.load_penguins().dropna()
 
-df.head(3)
-```
-
-## Define Model and Fit
-
-```{python}
 X = get_dummies(df[['bill_length_mm', 'species', 'sex']], drop_first = True)
 y = df['body_mass_g']
 
 model = LinearRegression().fit(X, y)
 ```
 
-## Get some information
+Scikit for Python contains powerful tools that make creating models easy.
+
+## Model Information
+
+Here, then, is some statistics from the model.
 
 ```{python}
+#| code-fold: true
 print(f"R^2 {model.score(X,y)}")
 print(f"Intercept {model.intercept_}")
 print(f"Columns {X.columns}")
 print(f"Coefficients {model.coef_}")
 ```
+
+A few inferences that we can make is that for every mm of `bill_length_mm`, `body_mass_g` increases by 32.5g.  Also, the Chinstrap species has less mass than the other two, and Gentoo has the most mass.  Males are also, typically, heavier than females.
+
+We can see that approximately 85% of the variance of the data is explained by our model.  While far from perfect, it is good enough for demonstration purposes.
+

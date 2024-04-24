@@ -1,11 +1,12 @@
 ---
-title: "final_devops"
+title: "Home"
+format:
+  html:
+    code-fold: true
 ---
 
-This is a Quarto website.
+Welcome to C2C Ben Cometto's exploration of the penguin dataset.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+![Penguins](palmers_penguins.png)
 
-```{r}
-1 + 1
-```
+According to its creators, the Palmer Penguins dataset exists "to a great dataset for data exploration & visualization, as an alternative to iris."  That is exactly how we are using it.  Across this website, you will see an exploration of the data set, followed by the creation of a model.  A similar model is used in an associated app that can be reached [here](http://localhost:8090){target="_blank"}.
