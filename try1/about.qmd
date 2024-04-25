@@ -5,7 +5,7 @@ format:
     code-fold: true
 ---
 
-This site was created by C2C Ben Cometto for the Math 378 Stats Final Project.  It is all build with Docker compose, and runs with wizardy... not to be confused with magic.
+This site was created by C2C Ben Cometto for the Math 378 Stats Final Project.  It is all built with Docker compose, and runs with wizardy... not to be confused with magic.
 
 ![ChatGPT-Generated Penguins](gpt-penguins4.png)
 
@@ -109,6 +109,8 @@ COPY nginx.conf  /etc/nginx/nginx.conf
 
 Here, the container starts with an `nginx` image.  It deletes the default configs and replaces them with the ones I created (but, didn't change.  I was troubleshooting... and cookies turned out to be the problem).  This container doesn't work without Docker compose, as it requires a volume to be created to access the static website files.
 
+Realistically, all of the custom images could work with standard images in the compose file.  However, it was good to learn how to build the individual images, and it results in a cleaner Docker compose file.
+
 ## HTTPS Function
 
 The website is able to use HTTPS through an `nginx` webserver and a `certbot`.  A configuration file of the `nginx` webserver is below.
@@ -175,12 +177,16 @@ server {
 }
 ```
 
-It sets up three servers.  One listens on Port `80` for the `certbot`.  Another listens on port `443`, which is the standard port for HTTPS.  If it passes the SSL certificate, it is passed to the website.  The third server listens on port `8443`, and passes HTTPS traffic to the prediction app.
+It sets up three servers.  One listens on Port `80` for the `certbot`.  Another listens on port `443`, which is the standard port for HTTPS.  If it passes the SSL certificate, it is passed to the website.  The third server listens on port `8443`, and passes HTTPS traffic to the prediction app.  The third server has some proxy header-related lines to handle ShinyApp's `webhost` needs.
 
 ## DNS
 
-The domain name is owned by my family, and I was able to have it set up that devops.cometto.org pointed to this virtual machine.  HTTPS in the web browser automatically asks for port `443`.
+The domain name is owned by my family, and I was able to have it set up that devops.cometto.org pointed to this machine.  HTTPS in the web browser automatically asks for port `443`.
 
 ## Overall Function
 
-Overall, the website runs on a virtual machine, is set up using Docker compose, and hosts a static website, an API, and the prediction app.  To access the files for the project, or to get a better understanding of what is happening, the github is available [here](https://github.com/dbcometto/final_devops){target="_blank"}.
+Overall, the website runs on a virtual machine, is set up using Docker compose, and hosts a static website, an API, and the prediction app.  To access the files for the project, which would help you get a better understanding of what is happening, the github is available [here](https://github.com/dbcometto/final_devops){target="_blank"}.
+
+## Future Development
+
+The immediate next step would be to create a Docker container to render the Quarto Markdown files used to create the static website.  As it stands, I have to render them, then copy them into the correct location.  It would be better for the Docker compose to be able to render the files itself.

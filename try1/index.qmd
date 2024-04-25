@@ -9,7 +9,7 @@ Welcome to C2C Ben Cometto's exploration of the penguin dataset.
 
 ![ChatGPT-Generated Penguins](gpt-penguins1.png)
 
-According to its creators, the Palmer Penguins dataset exists "to a great dataset for data exploration & visualization, as an alternative to iris."  
+According to its creators, the Palmer Penguins dataset exists to be "a great dataset for data exploration & visualization, as an alternative to iris."  
 
 That is exactly how we are using it.  Across this website, you will see an exploration of the data set, followed by the creation of a model.  You will be followed by our favorite three penguins, one of each species.
 
