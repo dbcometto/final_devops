@@ -20,11 +20,12 @@ services:
     ports:
       - 80:80
       - 443:443
+    restart: always
     volumes:
       - ./docs:/usr/share/nginx/html
       - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./nginx/templates/template-variables.template:/etc/nginx/templates/10-variables.conf.template:ro
       - ./certbot/www/:/var/www/certbot/:ro
-    restart: always
     environment:
       - HOSTNAME=devops.cometto.org
 
