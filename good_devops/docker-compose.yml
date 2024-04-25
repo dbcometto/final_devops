@@ -1,5 +1,7 @@
 version: '3'
+
 services:
+
   webserver:
     image: nginx:latest
     ports:
@@ -10,8 +12,17 @@ services:
       - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
       - ./certbot/www/:/var/www/certbot/:ro
       - ./certbot/conf:/etc/nginx/ssl/
+
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
+
+  web:
+    build: ./web
+    image: devops-web
+    ports:
+      - 8095:80
+    volumes:
+      - ./docker-volumes/docs:/usr/share/nginx/html
