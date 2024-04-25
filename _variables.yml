@@ -1,1 +1,1 @@
-apphost: ${HOSTNAME:localhost}
+apphost: devops.cometto.org

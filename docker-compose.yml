@@ -26,8 +26,6 @@ services:
       - ./nginx/conf/:/etc/nginx/conf.d/
       - ./nginx/templates/template-variables.template:/etc/nginx/templates/10-variables.conf.template
       - ./certbot/www/:/var/www/certbot/
-    environment:
-      - HOSTNAME=devops.cometto.org
 
   certbot:
     image: certbot/certbot:latest
