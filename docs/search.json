@@ -25,35 +25,56 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "This site was created by C2C Ben Cometto for the Math 378 Stats Final Project. It is all build with docker compose, and runs with wizardy… not to be confused with magic."
+    "text": "This site was created by C2C Ben Cometto for the Math 378 Stats Final Project. It is all built with Docker compose, and runs with wizardy… not to be confused with magic."
   },
   {
     "objectID": "about.html#docker-compose",
     "href": "about.html#docker-compose",
     "title": "About",
     "section": "Docker Compose",
-    "text": "Docker Compose\nDocker compose is a system that allows multiple docker containers to be started simultaneously. For this project, the docker-compose.yml file is as follows.\n```{yml}\nservices:\n  api:\n    hostname: myapi\n    image: devops-api\n    command: python runapi.py\n    ports:\n      - 8080:8080\n\n  app:\n    hostname: myapp\n    image: devops-app\n    command: python app-log.py\n    ports:\n      - 8090:8090\n\n  web:\n    image: devops-web\n    ports:\n      - 8095:80\n    volumes:\n      - ./docs:/usr/share/nginx/html\n```\nThere are three separate docker containers: the API, the app, and the website. Each has a different image (that I build with three more individual Dockerfiles.), The docker-compose.yml file creates a network and automatically works the containers together, as can be seen below in Docker Desktop.\n\n\n\nDocker Desktop"
+    "text": "Docker Compose\nDocker compose is a system that allows multiple Docker containers to be started simultaneously. For this project, the docker-compose.yml file is as follows.\n```{yml}\nversion: '3'\n\nservices:\n\n  api:\n    hostname: myapi\n    build: ./api\n    image: devops-api\n    command: python runapi.py\n    networks:\n      - slide\n\n  app:\n    hostname: myapp\n    build: ./app\n    image: devops-app\n    command: python app-log.py\n    networks:\n     - slide\n\n  webserver:\n    image: nginx:latest\n    ports:\n      - 80:80\n      - 443:443\n      - 8443:8443\n    restart: always\n    volumes:\n      - ./nginx/conf.d/:/etc/nginx/conf.d/:ro\n      - ./certbot/www/:/var/www/certbot/:ro\n      - ./certbot/conf:/etc/nginx/ssl/\n    networks:\n      - slide\n\n  certbot:\n    image: certbot/certbot:latest\n    volumes:\n      - ./certbot/www/:/var/www/certbot/:rw\n      - ./certbot/conf/:/etc/letsencrypt/:rw\n    networks:\n      - slide\n\n  web:\n    hostname: webapp\n    build: ./web\n    image: devops-web\n    volumes:\n      - ./docker-volumes/docs:/usr/share/nginx/html\n    networks:\n      - slide\n\nnetworks:\n  slide:\n    driver: bridge\n```\nThere are five separate Docker containers: the API, the app, the website, the web server, and the certificate bot. Each has a different image, three of which I build with individual Dockerfiles. I also create a network so all of the containers can work together, and a few volumes so files are persistent."
   },
   {
     "objectID": "about.html#dockerfiles",
     "href": "about.html#dockerfiles",
     "title": "About",
     "section": "Dockerfiles",
-    "text": "Dockerfiles\nAs an example of a Dockerfile, below is the file for the API.\n```{yml}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8080\nCMD [\"python\",\"runapi.py\"]\n```\nThe docker container starts with a slim Python image, copies in the script, installs the requirements, then runs the API.\nThe app dockerfile is essentially the same.\n```{yml}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8090\nCMD [\"python\",\"app-log.py\"]\n```\nAnd below, the file for the static website container.\n```{yml}\nFROM nginx:alpine\nRUN rm /etc/nginx/conf.d/default.conf && rm /etc/nginx/nginx.conf\nCOPY default.conf /etc/nginx/conf.d\nCOPY nginx.conf  /etc/nginx/nginx.conf\n```\nHere, the container starts with an nginx image. It deletes the default configs and replaces them with the ones I created (but, didn’t change. I was troubleshooting… and cookies turned out to be the problem). This container doesn’t work without the docker-compose, as it requires a volume to be created to access the static website files."
+    "text": "Dockerfiles\nThe first Dockerfile, for the API, is below.\n```{Dockerfile}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8080\nCMD [\"python\",\"runapi.py\"]\n```\nThe Docker container starts with a slim Python image, copies in the script, installs the requirements, then runs the API.\nThe app Dockerfile is essentially the same.\n```{Dockerfile}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8090\nCMD [\"python\",\"app-log.py\"]\n```\nAnd below is the file for the static website container.\n```{Dockerfile}\nFROM nginx:alpine\nRUN rm /etc/nginx/conf.d/default.conf && rm /etc/nginx/nginx.conf\nCOPY default.conf /etc/nginx/conf.d\nCOPY nginx.conf  /etc/nginx/nginx.conf\n```\nHere, the container starts with an nginx image. It deletes the default configs and replaces them with the ones I created (but, didn’t change. I was troubleshooting… and cookies turned out to be the problem). This container doesn’t work without Docker compose, as it requires a volume to be created to access the static website files.\nRealistically, all of the custom images could work with standard images in the compose file. However, it was good to learn how to build the individual images, and it results in a cleaner Docker compose file."
   },
   {
-    "objectID": "about.html#summary-of-function",
-    "href": "about.html#summary-of-function",
+    "objectID": "about.html#https-function",
+    "href": "about.html#https-function",
     "title": "About",
-    "section": "Summary of Function",
-    "text": "Summary of Function\nBig picture, the static website is hosted on port 8095, and the app is hosted on port 8090. The static website has a link to the app. They’re both simultaneously hosted, but not truly the same thing. The links are unfortunately a little janky, as the app is not truly part of the static website. Future improvements would link these together, or at least make the theme consistent throughout.\nTo access the files for the project, or to get a better understanding of what is happening, the github is available here."
+    "section": "HTTPS Function",
+    "text": "HTTPS Function\nThe website is able to use HTTPS through an nginx webserver and a certbot. A configuration file of the nginx webserver is below.\n```{conf}\nmap $http_upgrade $connection_upgrade {\n    default upgrade;\n    '' close;\n}\n\nserver {\n    listen 80;\n    listen [::]:80;\n\n    server_name devops.cometto.org;\n    server_tokens off;\n\n    location /.well-known/acme-challenge/ {\n        root /var/www/certbot;\n    }\n    location / {\n        return 301 https://devops.cometto.org$request_uri;\n    }\n}\n\nserver {\n    listen 443 default_server ssl http2;\n    listen [::]:443 ssl http2;\n\n    server_name devops.cometto.org;\n\n    ssl_certificate /etc/nginx/ssl/live/devops.cometto.org/fullchain.pem;\n    ssl_certificate_key /etc/nginx/ssl/live/devops.cometto.org/privkey.pem;\n\n    location / {\n        proxy_pass http://webapp:80;\n    }\n}\n\nserver {\n    listen 8443 default_server ssl http2;\n    listen [::]:8443 ssl http2;\n\n    server_name devops.cometto.org;\n\n    ssl_certificate /etc/nginx/ssl/live/devops.cometto.org/fullchain.pem;\n    ssl_certificate_key /etc/nginx/ssl/live/devops.cometto.org/privkey.pem;\n\n    location / {\n        proxy_set_header    Host $host;\n        proxy_set_header    X-Real-IP $remote_addr;\n        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header    X-Forwarded-Proto $scheme;\n        proxy_pass http://myapp:8090;\n        proxy_read_timeout  20d;\n        proxy_buffering off; \n\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection $connection_upgrade;\n        proxy_http_version 1.1;\n\n        proxy_redirect      / $scheme://$host/;   \n    }\n}\n```\nIt sets up three servers. One listens on Port 80 for the certbot. Another listens on port 443, which is the standard port for HTTPS. If it passes the SSL certificate, it is passed to the website. The third server listens on port 8443, and passes HTTPS traffic to the prediction app. The third server has some proxy header-related lines to handle ShinyApp’s webhost needs."
+  },
+  {
+    "objectID": "about.html#dns",
+    "href": "about.html#dns",
+    "title": "About",
+    "section": "DNS",
+    "text": "DNS\nThe domain name is owned by my family, and I was able to have it set up that devops.cometto.org pointed to this machine. HTTPS in the web browser automatically asks for port 443."
+  },
+  {
+    "objectID": "about.html#overall-function",
+    "href": "about.html#overall-function",
+    "title": "About",
+    "section": "Overall Function",
+    "text": "Overall Function\nOverall, the website runs on a virtual machine, is set up using Docker compose, and hosts a static website, an API, and the prediction app. To access the files for the project, which would help you get a better understanding of what is happening, the github is available here."
+  },
+  {
+    "objectID": "about.html#future-development",
+    "href": "about.html#future-development",
+    "title": "About",
+    "section": "Future Development",
+    "text": "Future Development\nThe immediate next step would be to create a Docker container to render the Quarto Markdown files used to create the static website. As it stands, I have to render them, then copy them into the correct location. It would be better for the Docker compose to be able to render the files itself."
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Home",
     "section": "",
-    "text": "Welcome to C2C Ben Cometto’s exploration of the penguin dataset.\n\n\n\nChatGPT-Generated Penguins\n\n\nAccording to its creators, the Palmer Penguins dataset exists “to a great dataset for data exploration & visualization, as an alternative to iris.”\nThat is exactly how we are using it. Across this website, you will see an exploration of the data set, followed by the creation of a model. You will be followed by our favorite three penguins, one of each species.\nThe model is built into an API that can be accessed through a prediction app here."
+    "text": "Welcome to C2C Ben Cometto’s exploration of the penguin dataset.\n\n\n\nChatGPT-Generated Penguins\n\n\nAccording to its creators, the Palmer Penguins dataset exists to be “a great dataset for data exploration & visualization, as an alternative to iris.”\nThat is exactly how we are using it. Across this website, you will see an exploration of the data set, followed by the creation of a model. You will be followed by our favorite three penguins, one of each species.\nThe model is built into an API that can be accessed through a prediction app here."
   },
   {
     "objectID": "eda-basic.html",
