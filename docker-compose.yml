@@ -19,3 +19,5 @@ services:
       - 8095:80
     volumes:
       - ./docs:/usr/share/nginx/html
+    environment:
+      - SETHOSTNAME=localhost

@@ -13,4 +13,4 @@ According to its creators, the Palmer Penguins dataset exists "to a great datase
 
 That is exactly how we are using it.  Across this website, you will see an exploration of the data set, followed by the creation of a model.  You will be followed by our favorite three penguins, one of each species.
 
-**The model is built into an API that can be accessed through a prediction app [here](http://{{< var apphost >}}:8090){target="_blank"}.**
+**The model is built into an API that can be accessed through a prediction app [here](http://{{< env SETHOSTNAME >}}:8090){target="_blank"}.**

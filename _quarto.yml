@@ -19,6 +19,7 @@ website:
         text: Model
       - href: about.qmd
         text: About
+    pinned: true
     collapse: true
 
 format:
