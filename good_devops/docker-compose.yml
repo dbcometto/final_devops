@@ -2,6 +2,22 @@ version: '3'
 
 services:
 
+  api:
+    hostname: myapi
+    build: ./api
+    image: devops-api
+    command: python runapi.py
+    ports:
+      - 8080:8080
+
+  app:
+    hostname: myapp
+    build: ./app
+    image: devops-app
+    command: python app-log.py
+    ports:
+      - 8090:8090
+      
   webserver:
     image: nginx:latest
     ports:

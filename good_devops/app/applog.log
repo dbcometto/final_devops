@@ -1,0 +1,10 @@
+2024-04-22 18:48:01,666 - Using proactor: IocpProactor
+2024-04-22 18:48:13,478 - App start
+2024-04-22 18:48:15,504 - Request Made
+2024-04-22 18:48:15,506 - Starting new HTTP connection (1): 127.0.0.1:8080
+2024-04-22 18:48:15,509 - http://127.0.0.1:8080 "POST /predict HTTP/1.1" 200 31
+2024-04-22 18:48:15,509 - Request Returned
+2024-04-22 18:48:17,711 - Request Made
+2024-04-22 18:48:17,712 - Starting new HTTP connection (1): 127.0.0.1:8080
+2024-04-22 18:48:17,714 - http://127.0.0.1:8080 "POST /predict HTTP/1.1" 200 32
+2024-04-22 18:48:17,715 - Request Returned
