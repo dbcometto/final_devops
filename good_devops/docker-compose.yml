@@ -7,12 +7,16 @@ services:
     build: ./api
     image: devops-api
     command: python runapi.py
+    networks:
+      - slide
 
   app:
     hostname: myapp
     build: ./app
     image: devops-app
     command: python app-log.py
+    networks:
+     - slide
 
   webserver:
     image: nginx:latest
@@ -25,12 +29,16 @@ services:
       - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
       - ./certbot/www/:/var/www/certbot/:ro
       - ./certbot/conf:/etc/nginx/ssl/
+    networks:
+      - slide
 
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
+    networks:
+      - slide
 
   web:
     hostname: webapp
@@ -38,3 +46,9 @@ services:
     image: devops-web
     volumes:
       - ./docker-volumes/docs:/usr/share/nginx/html
+    networks:
+      - slide
+
+networks:
+  slide:
+    driver: bridge
