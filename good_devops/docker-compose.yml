@@ -13,8 +13,6 @@ services:
     build: ./app
     image: devops-app
     command: python app-log.py
-    ports: 
-      - 8091:8090
 
   webserver:
     image: nginx:latest
@@ -35,9 +33,8 @@ services:
       - ./certbot/conf/:/etc/letsencrypt/:rw
 
   web:
+    hostname: webapp
     build: ./web
     image: devops-web
-    ports:
-      - 8095:80
     volumes:
       - ./docker-volumes/docs:/usr/share/nginx/html
