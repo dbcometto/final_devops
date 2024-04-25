@@ -1,0 +1,100 @@
+[
+  {
+    "objectID": "model-basic-py.html",
+    "href": "model-basic-py.html",
+    "title": "Model",
+    "section": "",
+    "text": "Here we will create our model for the Palmer Penguin dataset. We are trying to predict body_mass_g based on bill_length_mm, species, and sex.\nThe finished model can be accessed here. It runs on a background API and a ShinyApp. However, let’s dive into how the model is created."
+  },
+  {
+    "objectID": "model-basic-py.html#model-creation",
+    "href": "model-basic-py.html#model-creation",
+    "title": "Model",
+    "section": "Model Creation",
+    "text": "Model Creation\nBased on our exploration, the data looks to have a somewhat-linear relationship. Thus, let’s implement a linear regression model, for simplicity and interpretability.\nRemember, our primary goal for this project is a proof of concept of developmental operations for data science. Thus, a simple, interpretable model will be best.\nThe following code chunk imports the dataset and creates a linear regression model.\n\nfrom palmerpenguins import penguins\nfrom pandas import get_dummies\nimport numpy as np\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn import preprocessing\n\ndf = penguins.load_penguins().dropna()\n\nX = get_dummies(df[['bill_length_mm', 'species', 'sex']], drop_first = True)\ny = df['body_mass_g']\n\nmodel = LinearRegression().fit(X, y)\n\nScikit for Python contains powerful tools that make creating models easy."
+  },
+  {
+    "objectID": "model-basic-py.html#model-information",
+    "href": "model-basic-py.html#model-information",
+    "title": "Model",
+    "section": "Model Information",
+    "text": "Model Information\nHere, then, is some statistics from the model.\n\n\nR^2: 0.8555368759537614\n\n\nWe can see that approximately 85% of the variance of the data is explained by our model. While far from perfect, it is good enough for demonstration purposes.\nWe can also access model parameters.\n\n\nIntercept: 2169.2697209393973\nColumns: Index(['bill_length_mm', 'species_Chinstrap', 'species_Gentoo', 'sex_male'], dtype='object')\nCoefficients&gt; [  32.53688677 -298.76553447 1094.86739145  547.36692408]\n\n\nThus, our model can be written as \\(m = 32.5 l -298.7 c + 1094.8 g + 547.3 s + 2169\\) where \\(m\\) is mass in grams, \\(l\\) is bill length in mm, and \\(c\\) and \\(g\\) are 0 or 1 depending on whether the species is Chinstrap or Gentoo, respectively, and \\(s\\) is 1 if sex is male.\nA few inferences that we can make is that for every 1mm of bill_length_mm, body_mass_g increases by 32.5g. Also, the Chinstrap species has less mass than the other two, and Gentoo has the most mass. Males are also, typically, heavier than females."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This site was created by C2C Ben Cometto for the Math 378 Stats Final Project. It is all build with Docker compose, and runs with wizardy… not to be confused with magic."
+  },
+  {
+    "objectID": "about.html#docker-compose",
+    "href": "about.html#docker-compose",
+    "title": "About",
+    "section": "Docker Compose",
+    "text": "Docker Compose\nDocker compose is a system that allows multiple Docker containers to be started simultaneously. For this project, the docker-compose.yml file is as follows.\n```{yml}\nversion: '3'\n\nservices:\n\n  api:\n    hostname: myapi\n    build: ./api\n    image: devops-api\n    command: python runapi.py\n    networks:\n      - slide\n\n  app:\n    hostname: myapp\n    build: ./app\n    image: devops-app\n    command: python app-log.py\n    networks:\n     - slide\n\n  webserver:\n    image: nginx:latest\n    ports:\n      - 80:80\n      - 443:443\n      - 8443:8443\n    restart: always\n    volumes:\n      - ./nginx/conf.d/:/etc/nginx/conf.d/:ro\n      - ./certbot/www/:/var/www/certbot/:ro\n      - ./certbot/conf:/etc/nginx/ssl/\n    networks:\n      - slide\n\n  certbot:\n    image: certbot/certbot:latest\n    volumes:\n      - ./certbot/www/:/var/www/certbot/:rw\n      - ./certbot/conf/:/etc/letsencrypt/:rw\n    networks:\n      - slide\n\n  web:\n    hostname: webapp\n    build: ./web\n    image: devops-web\n    volumes:\n      - ./docker-volumes/docs:/usr/share/nginx/html\n    networks:\n      - slide\n\nnetworks:\n  slide:\n    driver: bridge\n```\nThere are five separate Docker containers: the API, the app, the website, the web server, and the certificate bot. Each has a different image, three of which I build with individual Dockerfiles. I also create a network so all of the containers can work together, and a few volumes so files are persistent."
+  },
+  {
+    "objectID": "about.html#dockerfiles",
+    "href": "about.html#dockerfiles",
+    "title": "About",
+    "section": "Dockerfiles",
+    "text": "Dockerfiles\nThe first Dockerfile, for the API, is below.\n```{Dockerfile}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8080\nCMD [\"python\",\"runapi.py\"]\n```\nThe Docker container starts with a slim Python image, copies in the script, installs the requirements, then runs the API.\nThe app Dockerfile is essentially the same.\n```{Dockerfile}\nFROM python:3.11-slim\nCOPY . /opt/app\nWORKDIR /opt/app\nRUN python -m pip install --upgrade pip && pip install -r ./requirements.txt\nEXPOSE 8090\nCMD [\"python\",\"app-log.py\"]\n```\nAnd below is the file for the static website container.\n```{Dockerfile}\nFROM nginx:alpine\nRUN rm /etc/nginx/conf.d/default.conf && rm /etc/nginx/nginx.conf\nCOPY default.conf /etc/nginx/conf.d\nCOPY nginx.conf  /etc/nginx/nginx.conf\n```\nHere, the container starts with an nginx image. It deletes the default configs and replaces them with the ones I created (but, didn’t change. I was troubleshooting… and cookies turned out to be the problem). This container doesn’t work without Docker compose, as it requires a volume to be created to access the static website files."
+  },
+  {
+    "objectID": "about.html#https-function",
+    "href": "about.html#https-function",
+    "title": "About",
+    "section": "HTTPS Function",
+    "text": "HTTPS Function\nThe website is able to use HTTPS through an nginx webserver and a certbot. A configuration file of the nginx webserver is below.\n```{conf}\nmap $http_upgrade $connection_upgrade {\n    default upgrade;\n    '' close;\n}\n\nserver {\n    listen 80;\n    listen [::]:80;\n\n    server_name devops.cometto.org;\n    server_tokens off;\n\n    location /.well-known/acme-challenge/ {\n        root /var/www/certbot;\n    }\n    location / {\n        return 301 https://devops.cometto.org$request_uri;\n    }\n}\n\nserver {\n    listen 443 default_server ssl http2;\n    listen [::]:443 ssl http2;\n\n    server_name devops.cometto.org;\n\n    ssl_certificate /etc/nginx/ssl/live/devops.cometto.org/fullchain.pem;\n    ssl_certificate_key /etc/nginx/ssl/live/devops.cometto.org/privkey.pem;\n\n    location / {\n        proxy_pass http://webapp:80;\n    }\n}\n\nserver {\n    listen 8443 default_server ssl http2;\n    listen [::]:8443 ssl http2;\n\n    server_name devops.cometto.org;\n\n    ssl_certificate /etc/nginx/ssl/live/devops.cometto.org/fullchain.pem;\n    ssl_certificate_key /etc/nginx/ssl/live/devops.cometto.org/privkey.pem;\n\n    location / {\n        proxy_set_header    Host $host;\n        proxy_set_header    X-Real-IP $remote_addr;\n        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header    X-Forwarded-Proto $scheme;\n        proxy_pass http://myapp:8090;\n        proxy_read_timeout  20d;\n        proxy_buffering off; \n\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection $connection_upgrade;\n        proxy_http_version 1.1;\n\n        proxy_redirect      / $scheme://$host/;   \n    }\n}\n```\nIt sets up three servers. One listens on Port 80 for the certbot. Another listens on port 443, which is the standard port for HTTPS. If it passes the SSL certificate, it is passed to the website. The third server listens on port 8443, and passes HTTPS traffic to the prediction app."
+  },
+  {
+    "objectID": "about.html#dns",
+    "href": "about.html#dns",
+    "title": "About",
+    "section": "DNS",
+    "text": "DNS\nThe domain name is owned by my family, and I was able to have it set up that devops.cometto.org pointed to this virtual machine. HTTPS in the web browser automatically asks for port 443."
+  },
+  {
+    "objectID": "about.html#overall-function",
+    "href": "about.html#overall-function",
+    "title": "About",
+    "section": "Overall Function",
+    "text": "Overall Function\nOverall, the website runs on a virtual machine, is set up using Docker compose, and hosts a static website, an API, and the prediction app. To access the files for the project, or to get a better understanding of what is happening, the github is available here."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Welcome to C2C Ben Cometto’s exploration of the penguin dataset.\n\n\n\nChatGPT-Generated Penguins\n\n\nAccording to its creators, the Palmer Penguins dataset exists “to a great dataset for data exploration & visualization, as an alternative to iris.”\nThat is exactly how we are using it. Across this website, you will see an exploration of the data set, followed by the creation of a model. You will be followed by our favorite three penguins, one of each species.\nThe model is built into an API that can be accessed through a prediction app here."
+  },
+  {
+    "objectID": "eda-basic.html",
+    "href": "eda-basic.html",
+    "title": "Penguins EDA",
+    "section": "",
+    "text": "Here we will explore the Palmer Penguin dataset."
+  },
+  {
+    "objectID": "eda-basic.html#initial-observations",
+    "href": "eda-basic.html#initial-observations",
+    "title": "Penguins EDA",
+    "section": "Initial Observations",
+    "text": "Initial Observations\nWe will start with looking at the variables that are present in the dataset.\n\n\nRows: 344\nColumns: 8\n$ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…\n$ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…\n$ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …\n$ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …\n$ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…\n$ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …\n$ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…\n$ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…\n\n\nWe can see that we have species, island, and sex as factors, year, flipper_length_mm, and body_mass_g as integers, and bill_length_mm and bill_depth_mm as doubles.\nNow, let’s get a sample of what the data looks like.\n\n\n# A tibble: 5 × 8\n  species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g\n  &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;\n1 Adelie  Torgersen           39.1          18.7               181        3750\n2 Adelie  Torgersen           39.5          17.4               186        3800\n3 Adelie  Torgersen           40.3          18                 195        3250\n4 Adelie  Torgersen           NA            NA                  NA          NA\n5 Adelie  Torgersen           36.7          19.3               193        3450\n# ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;"
+  },
+  {
+    "objectID": "eda-basic.html#tables",
+    "href": "eda-basic.html#tables",
+    "title": "Penguins EDA",
+    "section": "Tables",
+    "text": "Tables\nWe can continue our exploration with a table that shows the average size values when the observations are grouped by sex and species.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nspecies\nsex\nbill_length_mm\nbill_depth_mm\nflipper_length_mm\nbody_mass_g\nyear\n\n\n\n\nAdelie\nfemale\n37.25753\n17.62192\n187.7945\n3368.836\n2008.055\n\n\nAdelie\nmale\n40.39041\n19.07260\n192.4110\n4043.493\n2008.055\n\n\nAdelie\nNA\n37.84000\n18.32000\n185.6000\n3540.000\n2007.000\n\n\nChinstrap\nfemale\n46.57353\n17.58824\n191.7353\n3527.206\n2007.971\n\n\nChinstrap\nmale\n51.09412\n19.25294\n199.9118\n3938.971\n2007.971\n\n\nGentoo\nfemale\n45.56379\n14.23793\n212.7069\n4679.741\n2008.069\n\n\nGentoo\nmale\n49.47377\n15.71803\n221.5410\n5484.836\n2008.066\n\n\nGentoo\nNA\n45.62500\n14.55000\n215.7500\n4587.500\n2008.400\n\n\n\n\n\nThis can be contrasted with the medians of each group, as is seen below.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nspecies\nsex\nbill_length_mm\nbill_depth_mm\nflipper_length_mm\nbody_mass_g\nyear\n\n\n\n\nAdelie\nfemale\n37.00\n17.60\n188.0\n3400.0\n2008\n\n\nAdelie\nmale\n40.60\n18.90\n193.0\n4000.0\n2008\n\n\nAdelie\nNA\n37.80\n18.10\n186.0\n3475.0\n2007\n\n\nChinstrap\nfemale\n46.30\n17.65\n192.0\n3550.0\n2008\n\n\nChinstrap\nmale\n50.95\n19.30\n200.5\n3950.0\n2008\n\n\nGentoo\nfemale\n45.50\n14.25\n212.0\n4700.0\n2008\n\n\nGentoo\nmale\n49.50\n15.70\n221.0\n5500.0\n2008\n\n\nGentoo\nNA\n45.35\n14.35\n216.0\n4687.5\n2009\n\n\n\n\n\nThe medians are very close to the averages."
+  },
+  {
+    "objectID": "eda-basic.html#scatterplots",
+    "href": "eda-basic.html#scatterplots",
+    "title": "Penguins EDA",
+    "section": "Scatterplots",
+    "text": "Scatterplots\nBy looking at scatterplots we can see what relationships exist within the data.\nWe first will look at a scatterplot of bill_length_mm and body_mass_g by species.\n\n\n\n\n\n\n\n\n\nThis can also be done with sex.\n\n\n\n\n\n\n\n\n\nAnd, with island.\n\n\n\n\n\n\n\n\n\nBased on these three graphs, we can see that it does appear that there is a relationship between body_mass_g based on sex, island, species, and bill_length_mm. Thus, let’s create a model that predicts body_mass_g based on those predictors."
+  }
+]
