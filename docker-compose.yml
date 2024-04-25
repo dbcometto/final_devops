@@ -16,11 +16,20 @@ services:
       - 8090:8090
 
   web:
-    build: ./web
-    image: devops-web
+    image: nginx:latest
     ports:
-      - 8095:80
+      - 80:80
+      - 443:443
     volumes:
       - ./docs:/usr/share/nginx/html
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www/:/var/www/certbot/:ro
+    restart: always
     environment:
-      - SETHOSTNAME=localhost
+      - HOSTNAME=devops.cometto.org
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw

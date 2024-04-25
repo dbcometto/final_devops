@@ -1,1 +1,1 @@
-apphost: localhost
+apphost: ${HOSTNAME:localhost}
