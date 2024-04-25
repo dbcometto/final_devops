@@ -7,7 +7,7 @@ format:
 
 Here we will create our model for the Palmer Penguin dataset.  We are trying to predict `body_mass_g` based on `bill_length_mm`, `species`, and `sex`.  
 
-**The finished model can be accessed [here](http://{{< var apphost >}}:8090){target="_blank"}**.  It runs on a background API and a ShinyApp.  However, let's dive into how the model is created.
+**The finished model can be accessed [here](https://{{< var apphost >}}:8090){target="_blank"}**.  It runs on a background API and a ShinyApp.  However, let's dive into how the model is created.
 
 ![ChatGPT-Generated Penguins](gpt-penguins3.png)
 

@@ -210,7 +210,7 @@ window.Quarto = {
 
 
 <p>Here we will create our model for the Palmer Penguin dataset. We are trying to predict <code>body_mass_g</code> based on <code>bill_length_mm</code>, <code>species</code>, and <code>sex</code>.</p>
-<p><strong>The finished model can be accessed <a href="http://devops.cometto.org:8090" target="_blank">here</a></strong>. It runs on a background API and a ShinyApp. However, let’s dive into how the model is created.</p>
+<p><strong>The finished model can be accessed <a href="https://devops.cometto.org:8090" target="_blank">here</a></strong>. It runs on a background API and a ShinyApp. However, let’s dive into how the model is created.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="gpt-penguins3.png" class="img-fluid figure-img"></p>
@@ -222,7 +222,7 @@ window.Quarto = {
 <p>Based on our <a href="./eda-basic.html">exploration</a>, the data looks to have a somewhat-linear relationship. Thus, let’s implement a linear regression model, for simplicity and interpretability.</p>
 <p>Remember, our primary goal for this project is a proof of concept of developmental operations for data science. Thus, a simple, interpretable model will be best.</p>
 <p>The following code chunk imports the dataset and creates a linear regression model.</p>
-<div id="754dfc9c" class="cell" data-execution_count="1">
+<div id="9a8fbdaa" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> palmerpenguins <span class="im">import</span> penguins</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pandas <span class="im">import</span> get_dummies</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -241,14 +241,14 @@ window.Quarto = {
 <section id="model-information" class="level2">
 <h2 class="anchored" data-anchor-id="model-information">Model Information</h2>
 <p>Here, then, is some statistics from the model.</p>
-<div id="1044935e" class="cell" data-execution_count="2">
+<div id="f8cc78f2" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stdout">
 <pre><code>R^2: 0.8555368759537614</code></pre>
 </div>
 </div>
 <p>We can see that approximately 85% of the variance of the data is explained by our model. While far from perfect, it is good enough for demonstration purposes.</p>
 <p>We can also access model parameters.</p>
-<div id="0627842b" class="cell" data-execution_count="3">
+<div id="885fdb03" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-stdout">
 <pre><code>Intercept: 2169.2697209393973
 Columns: Index(['bill_length_mm', 'species_Chinstrap', 'species_Gentoo', 'sex_male'], dtype='object')
