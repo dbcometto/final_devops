@@ -23,9 +23,9 @@ services:
     restart: always
     volumes:
       - ./docs:/usr/share/nginx/html
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
-      - ./nginx/templates/template-variables.template:/etc/nginx/templates/10-variables.conf.template:ro
-      - ./certbot/www/:/var/www/certbot/:ro
+      - ./nginx/conf/:/etc/nginx/conf.d/
+      - ./nginx/templates/template-variables.template:/etc/nginx/templates/10-variables.conf.template
+      - ./certbot/www/:/var/www/certbot/
     environment:
       - HOSTNAME=devops.cometto.org
 
