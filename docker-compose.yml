@@ -1,6 +1,7 @@
 services:
   api:
     hostname: myapi
+    build: ./api
     image: devops-api
     command: python runapi.py
     ports:
@@ -8,12 +9,14 @@ services:
 
   app:
     hostname: myapp
+    build: ./app
     image: devops-app
     command: python app-log.py
     ports:
       - 8090:8090
 
   web:
+    build: ./web
     image: devops-web
     ports:
       - 8095:80
